@@ -6,6 +6,7 @@ import RPi.GPIO as GPIO
 import datetime
 #import httplib
 import SIM900
+import ssh_tunnel
 
 sys.path.insert(0, './DHT11_Python')
 import dht11
@@ -29,6 +30,8 @@ sim = SIM900.SIM900()
 sim.power_on()
 sim.activate_gprs()
 
+
+tunnel = ssh_tunnel.SSH_TUNNEL()
 
 while 1:
     # x=s.readline()
@@ -55,6 +58,12 @@ while 1:
     else:
         nInvalidIntervals += 1 
         print('No valid measurment this interval. {}. interval in a row.')
+
+    #   if tunnel.is_available()
+    #       os.system('sudo pon o2')
+    #       time.sleep(10)
+    #       tunnel.open()
+    #       os.system('sudo poff o2')
 
     time.sleep(measure_interval)
 
