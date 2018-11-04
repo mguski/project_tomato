@@ -1,0 +1,4 @@
+# private data that is not under version control
+
+APIKEY = 'insert key here'
+
