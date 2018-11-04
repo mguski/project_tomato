@@ -1,4 +1,7 @@
 # private data that is not under version control
 
-APIKEY = 'insert key here'
-
+APIKEY = 'the emoncms api key'
+DYNDNS_URL = 'url.eu'
+REV_SSH_PORT = xxx22
+REV_SSH_USER = 'local user'
+REV_SSH_FORWARD_PORT = xxx23
