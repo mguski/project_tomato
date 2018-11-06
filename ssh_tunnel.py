@@ -25,3 +25,6 @@ class SSH_TUNNEL:
         print(command)
         os.system(command)
 
+if __name__ == '__main__':
+    ST = SSH_TUNNEL()
+    ST.is_available()

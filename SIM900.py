@@ -45,6 +45,8 @@ class SIM900:
             out = ''
             while self.serial.inWaiting() > 0:
                 out += self.serial.read(1)
+                if self.serial.inWaiting <= 0:
+                   time.sleep(0.1)
             total_length = len(out)
             out = out[2:-2]
             print("   command: {} >> {} (length {})".format(command, out, total_length))
@@ -93,6 +95,7 @@ class SIM900:
 
             # check again
             if  self.isOn():
+                self.send_command('ATE0')
                 print(' GSM now active')
             else:
                 print(' GSM still off')
@@ -159,6 +162,23 @@ class SIM900:
         time.sleep(0.01)
         self.send_command('AT+CSCLK=0')
         print('SIM900 awake.')
+
+
+    def tcp_init(self):
+        self.send_command('AT+CSTT="internet"')
+        self.send_command('AT+CIICR')
+        self.send_command('AT+CIFSR')
+
+    def tcp_check_port(self):
+        command = 'AT+CIPSTART="TCP","{}","{}"'.format(private_data.DYNDNS_URL, private_data.REV_SSH_PORT)
+        print(command)
+        response = self.send_command(command, 3)
+        
+        if response[1] == 'CONNECT OK':
+            self.send_command('AT+CIPCLOSE')
+            return True
+        else:
+            return False
 
 
 

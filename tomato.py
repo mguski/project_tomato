@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import time
+import os
 import sys
 import serial
 import RPi.GPIO as GPIO
@@ -29,7 +30,7 @@ nInvalidIntervals = 0
 sim = SIM900.SIM900()
 sim.power_on()
 sim.activate_gprs()
-
+sim.tcp_init()
 
 tunnel = ssh_tunnel.SSH_TUNNEL()
 
@@ -64,6 +65,14 @@ while 1:
     #       time.sleep(10)
     #       tunnel.open()
     #       os.system('sudo poff o2')
+
+    if sim.tcp_check_port():
+        print('Opening PPP connection and reverse SSH tunnel')
+        os.system('sudo pon o2')
+        time.sleep(15)
+        tunnel.open()
+        os.system('sudo poff o2')
+        print('tunnel and PPP closed')
 
     time.sleep(measure_interval)
 
