@@ -26,11 +26,14 @@ sensor = dht11.DHT11(pin=sensor_gpio)
 nTries = 10
 nInvalidIntervals = 0
 
+def init_sim():
+    sim = SIM900.SIM900()
+    sim.power_on()
+    sim.activate_gprs()
+    sim.tcp_init()
+    return sim
 
-sim = SIM900.SIM900()
-sim.power_on()
-sim.activate_gprs()
-sim.tcp_init()
+sim = init_sim()
 
 tunnel = ssh_tunnel.SSH_TUNNEL()
 
@@ -60,19 +63,17 @@ while 1:
         nInvalidIntervals += 1 
         print('No valid measurment this interval. {}. interval in a row.')
 
-    #   if tunnel.is_available()
-    #       os.system('sudo pon o2')
-    #       time.sleep(10)
-    #       tunnel.open()
-    #       os.system('sudo poff o2')
 
     if sim.tcp_check_port():
         print('Opening PPP connection and reverse SSH tunnel')
         os.system('sudo pon o2')
+        sim.serial.close()
         time.sleep(15)
         tunnel.open()
         os.system('sudo poff o2')
-        print('tunnel and PPP closed')
-
-    time.sleep(measure_interval)
+        print('tunnel and PPP closing...')
+        time.sleep(15)
+        sim = init_sim()
+    else:
+        time.sleep(measure_interval)
 
