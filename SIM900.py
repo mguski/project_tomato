@@ -34,10 +34,10 @@ class SIM900:
         response_list = []
 
         for iResponse in range(nResponses):
-            print('  wait for response {} / {}'.format(iResponse +1, nResponses))
+            # print('  wait for response {} / {}'.format(iResponse +1, nResponses))
             wait_counter = 0
             while (self.serial.inWaiting() == 0 ) & (wait_counter < 50):
-                print('.')
+               # print('.')
                 time.sleep(0.1)
                 wait_counter += 1
 
@@ -108,6 +108,7 @@ class SIM900:
 
         self.send_command('AT+SAPBR=3,1,"Contype","GPRS"')
         self.send_command('AT+SAPBR=3,1,"APN","internet"')
+        time.sleep(15)  
         self.send_command('AT+SAPBR=1,1')
         self.send_command('AT+SAPBR=2,1')
         return True
