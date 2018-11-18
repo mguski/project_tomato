@@ -116,9 +116,10 @@ class SIM900:
     def deactivate_gprs(self):
         self.send_command('AT+SAPBR=0,1')
 
-    def http(self, url):
-        self.send_command('AT+HTTPINIT')
-        self.send_command('AT+HTTPSSL=1')
+    def http(self, url, isRetry=False):
+        if not isRetry:
+            self.send_command('AT+HTTPINIT')
+            self.send_command('AT+HTTPSSL=1')
         self.send_command('AT+HTTPPARA="CID",1')
         self.send_command('AT+HTTPPARA="URL","{:s}"'.format(url))
         response = self.send_command('AT+HTTPACTION=0', nResponses=2)
@@ -148,7 +149,10 @@ class SIM900:
         url_data = '&fulljson={{%22Temperatur%22:{:2.1f},%22Luftfeuchtigkeit%22:{:2.1f}}}'.format(temperature,humidity)
         url = url_main + url_data 
         
-        self.http(url)
+        response = self.http(url)
+        if not response:
+            response = self.http(url, isRetry=True)
+
 
     def sleep(self):
         print('Going to sleep mode...')

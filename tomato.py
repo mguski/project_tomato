@@ -75,5 +75,6 @@ while 1:
         time.sleep(15)
         sim = init_sim()
     else:
+        print('Waiting for {} minutes...'.format(measure_interval))
         time.sleep(measure_interval)
 
