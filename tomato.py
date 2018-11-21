@@ -5,11 +5,8 @@ import sys
 import serial
 import RPi.GPIO as GPIO
 import datetime
-#import httplib
 import SIM900
 import ssh_tunnel
-
-sys.path.insert(0, './DHT11_Python')
 import Adafruit_DHT
 
 # parameter
@@ -59,9 +56,7 @@ tunnel = ssh_tunnel.SSH_TUNNEL()
 while 1:
     result = read_sensor()
 
-
     if result['isValid']:
-     #   data_str = '{{"Temperatur":{:2.1f},"Luftfeuchtigkeit":{:2.1f}}}'.format(result.temperature, result.humidity)
         nInvalidIntervals = 0
         sim.activate_gprs()
         return_value = sim.post_data(result['temperature'], result['humidity'])
