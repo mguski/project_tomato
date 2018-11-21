@@ -10,11 +10,14 @@ import SIM900
 import ssh_tunnel
 
 sys.path.insert(0, './DHT11_Python')
-import dht11
+import Adafruit_DHT
 
 # parameter
 measure_interval = 60*5 # seconds
+
+sensor = Adafruit_DHT.DHT22
 sensor_gpio = 4
+sensor_nTries = 20
 
 
 # init GPIO
@@ -22,9 +25,25 @@ sensor_gpio = 4
 GPIO.setmode(GPIO.BCM)
 #GPIO.cleanup()
 
-sensor = dht11.DHT11(pin=sensor_gpio)
-nTries = 10
 nInvalidIntervals = 0
+
+def read_sensor():
+    isValid = False
+    iTry = 0
+
+    while (iTry < sensor_nTries and not isValid):
+        if iTry:
+            time.sleep(2)
+        humidity,temperature = Adafruit_DHT.read_retry(sensor, sensor_gpio)
+        isValid = humidity is not None and temperature is not None
+        iTry += 1
+
+    print('Measurement: valid={}, {} C {} %rH, try {}'.format(isValid, temperature, humidity, iTry))
+    output = {'isValid': isValid, 'temperature':temperature, 'humidity':humidity}
+
+    return output
+
+read_sensor()
 
 def init_sim():
     sim = SIM900.SIM900()
@@ -38,24 +57,14 @@ sim = init_sim()
 tunnel = ssh_tunnel.SSH_TUNNEL()
 
 while 1:
-    # x=s.readline()
-    # print("Messung...")
-    iTry = 1
-    result = sensor.read()
-    while (not result.is_valid()) and (iTry < nTries):
-        iTry += 1
-        print('  DHT11: Error while reading! reading again (try {}/{} )...'.format(iTry, nTries))
-        time.sleep(5)
-        result = sensor.read()
+    result = read_sensor()
 
-    if result.is_valid():
+
+    if result['isValid']:
      #   data_str = '{{"Temperatur":{:2.1f},"Luftfeuchtigkeit":{:2.1f}}}'.format(result.temperature, result.humidity)
         nInvalidIntervals = 0
         sim.activate_gprs()
-        return_value = sim.post_data(result.temperature, result.humidity)
-#        if not return_value:
- #           print('first transmit did not work, try again...')
- #           return_value = sim.post_data(result.temperature, result.humidity)
+        return_value = sim.post_data(result['temperature'], result['humidity'])
         sim.deactivate_gprs()
 
 
