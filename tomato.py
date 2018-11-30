@@ -81,4 +81,5 @@ while 1:
     else:
         print('Waiting for {} minutes...'.format(measure_interval/60))
         time.sleep(measure_interval)
+        sim.flush()
 

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import time
 import serial
+import sys
 import RPi.GPIO as GPIO
 import private_data
 
@@ -28,8 +29,23 @@ class SIM900:
         self.serial.isOpen()
         self.send_command('ATE0')
 
-
     def send_command(self, command, nResponses=1):
+        iTry = 0
+        nTries = 5
+
+        while (iTry <= nTries):
+            try:
+                return_value = self.send_command_once(command, nResponses)
+                return return_value
+            except:
+                iTry += 1 
+                print('SIM900 Serial Error no {}'.format(iTry))
+                print("Unexpected error:", sys.exc_info()[0])
+                if  (iTry == nTries):
+                    raise
+
+    def send_command_once(self, command, nResponses=1):
+
         self.serial.write(command + '\r\n')
         response_list = []
 
@@ -153,6 +169,8 @@ class SIM900:
         if not response:
             response = self.http(url, isRetry=True)
 
+    def flush(self):
+        self.serial.flushInput()
 
     def sleep(self):
         print('Going to sleep mode...')
