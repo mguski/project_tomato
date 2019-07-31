@@ -4,7 +4,7 @@ import serial
 
 
 url = 'https://emoncms.org/input/post?node=Node1&fulljson='
-apikey = '&apikey=eb6ae6f0bd875b7b0ddf01e18e89f9ae'
+apikey = '&apikey=xx'
 data = '{"Temperatur":100}'
 
 ser = serial.Serial(
